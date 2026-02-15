@@ -3,11 +3,15 @@ DoublyList<T>::DoublyList()
 : header(new Node), trailer(new Node) {
     header->next  = trailer;
     trailer->prev = header;
+    this->length  = 0;
 }
 
 template <typename T>
 DoublyList<T>::DoublyList(const DoublyList<T>& copyObj)
 : header(new Node), trailer(new Node) {
+    header->next  = trailer;
+    trailer->prev = header;
+    this->length  = 0;
     copy(copyObj);
 }
 
@@ -29,12 +33,6 @@ DoublyList<T>::~DoublyList() {
 }
 
 template <typename T>
-void DoublyList<T>::append(const T& elem) {
-    // TO DO: Implement the code for the append
-
-}
-
-template <typename T>
 void DoublyList<T>::clear() {
     for (Node* curr = nullptr; header->next != trailer; ) {
         curr = header->next->next;
@@ -48,7 +46,6 @@ void DoublyList<T>::clear() {
 
 template <typename T>
 void DoublyList<T>::copy(const DoublyList<T>& copyObj) {
-    this->length   = copyObj.length;
     Node* myCurr   = header;
     Node* copyCurr = copyObj.header->next;
 
@@ -62,22 +59,12 @@ void DoublyList<T>::copy(const DoublyList<T>& copyObj) {
 
     myCurr->next  = trailer;
     trailer->prev = myCurr;
-}
-
-template <typename T>
-T DoublyList<T>::getElement(int position) const {
-    // TO DO: Implent code for getElement at position
+    this->length  = copyObj.length;
 }
 
 template <typename T>
 int DoublyList<T>::getLength() const {
     return this->length;
-}
-
-
-template <typename T>
-void DoublyList<T>::insert(int position, const T& elem) {
-  // TO DO: Implement code to insert an element to list
 }
 
 template <typename T>
@@ -88,19 +75,105 @@ bool DoublyList<T>::isEmpty() const {
 }
 
 template <typename T>
+void DoublyList<T>::append(const T& elem) {
+    // TO DO: Implement the code for the append
+    Node* n = new Node(elem);
+
+    Node* last = trailer->prev;
+    last->next = n;
+    n->prev    = last;
+    n->next    = trailer;
+    trailer->prev = n;
+
+    this->length++;
+}
+
+template <typename T>
+T DoublyList<T>::getElement(int position) const {
+    // TO DO: Implent code for getElement at position
+    if (position < 0 || position >= this->length) {
+        throw string("getElement: error, position out of bounds");
+    }
+
+    Node* curr = header->next;
+    for (int i = 0; i < position; i++) {
+        curr = curr->next;
+    }
+
+    return curr->value;
+}
+
+template <typename T>
+void DoublyList<T>::insert(int position, const T& elem) {
+    // TO DO: Implement code to insert an element to list
+    if (position < 0 || position > this->length) {
+        throw string("insert: error, position out of bounds");
+    }
+
+    Node* after = header->next;
+    for (int i = 0; i < position; i++) {
+        after = after->next;
+    }
+
+    Node* before = after->prev;
+    Node* n = new Node(elem);
+
+    before->next = n;
+    n->prev = before;
+    n->next = after;
+    after->prev = n;
+
+    this->length++;
+}
+
+template <typename T>
 void DoublyList<T>::remove(int position) {
     // TO DO: Implement code to remove element at given position
+    if (position < 0 || position >= this->length) {
+        throw string("remove: error, position out of bounds");
+    }
+
+    Node* curr = header->next;
+    for (int i = 0; i < position; i++) {
+        curr = curr->next;
+    }
+
+    Node* before = curr->prev;
+    Node* after  = curr->next;
+
+    before->next = after;
+    after->prev  = before;
+
+    delete curr;
+    this->length--;
 }
 
 template <typename T>
 bool DoublyList<T>::search(const T& elem) const {
     // TO DO: Implement code to search for element
+    Node* curr = header->next;
+    while (curr != trailer) {
+        if (curr->value == elem) {
+            return true;
+        }
+        curr = curr->next;
+    }
     return false;
 }
 
 template <typename T>
 void DoublyList<T>::replace(int position, const T& elem) {
     // TO DO: Add code for replace method
+    if (position < 0 || position >= this->length) {
+        throw string("replace: error, position out of bounds");
+    }
+
+    Node* curr = header->next;
+    for (int i = 0; i < position; i++) {
+        curr = curr->next;
+    }
+
+    curr->value = elem;
 }
 
 template <typename T>
